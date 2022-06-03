@@ -16,7 +16,7 @@ public abstract class Bill {
         this.finalAmount = calculateFinalAmount(conceptsAndPrices);
     }
 
-    public double calculateFinalAmount(@NotNull Map<String, Double> bill){
+    private double calculateFinalAmount(@NotNull Map<String, Double> bill){
         final long[] i = {0};
         bill.forEach((k, v) -> i[0] += v);
         return i[0];
