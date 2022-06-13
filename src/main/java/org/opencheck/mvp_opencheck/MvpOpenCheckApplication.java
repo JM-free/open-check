@@ -64,6 +64,7 @@ public class MvpOpenCheckApplication {
 
 		// Methods that don't work
 		rq.setRefreshToken(refreshToken); //You need to set a valid refreshToken
+		//TODO Check these methods
 		rq.getAccessToken();
 		rq.checkAccessToken();
 		rq.getUserInfo();
