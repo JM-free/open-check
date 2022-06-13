@@ -2,6 +2,7 @@ package org.opencheck.mvp_opencheck.logic;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.core.SpringVersion;
 
 @Data
 @AllArgsConstructor
