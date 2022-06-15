@@ -1,4 +1,4 @@
-package org.opencheck.mvp_opencheck;
+package org.opencheck.mvp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
