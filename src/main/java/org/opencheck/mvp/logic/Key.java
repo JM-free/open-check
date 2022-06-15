@@ -1,4 +1,4 @@
-package org.opencheck.mvp_opencheck.logic;
+package org.opencheck.mvp.logic;
 
 public interface Key {
     //TODO Implement the class:

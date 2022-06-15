@@ -1,6 +1,5 @@
-package org.opencheck.mvp_opencheck.logic;
+package org.opencheck.mvp.logic;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,12 +8,12 @@ import java.util.Map;
 
 @Data
 public abstract class Bill {
-    private Map<String, Double> bill;
+    private Map<String, Double> bills;
     private double finalAmount;
 
-    protected Bill(Map<String, Double> bill) {
-        this.bill = bill;
-        this.finalAmount = calculateFinalAmount(bill);
+    protected Bill(Map<String, Double> bills) {
+        this.bills = bills;
+        this.finalAmount = calculateFinalAmount(bills);
     }
 
     public double calculateFinalAmount(@NotNull Map<String, Double> bill){
@@ -24,10 +23,10 @@ public abstract class Bill {
     }
 
     public Bill addNewBill(@NotNull Bill newBill){
-        Map<String, Double> newMap = new HashMap<>(this.bill);
-        newBill.getBill().forEach((key, value) -> newMap.merge(key, value, (value1, value2) -> value1 + value2));
+        Map<String, Double> newMap = new HashMap<>(this.bills);
+        newBill.getBills().forEach((key, value) -> newMap.merge(key, value, (value1, value2) -> value1 + value2));
 
-        this.bill = newMap;
+        this.bills = newMap;
         this.finalAmount += newBill.getFinalAmount();
 
         return this;

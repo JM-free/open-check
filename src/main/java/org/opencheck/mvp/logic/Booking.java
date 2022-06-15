@@ -1,4 +1,4 @@
-package org.opencheck.mvp_opencheck.logic;
+package org.opencheck.mvp.logic;
 
 import java.time.LocalDateTime;
 import java.util.List;

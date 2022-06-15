@@ -1,4 +1,4 @@
-package org.opencheck.mvp_opencheck.logic;
+package org.opencheck.mvp.logic;
 
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
