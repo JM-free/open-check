@@ -25,26 +25,21 @@ public class MvpOpenCheckApplication {
 
 		//Tested methods
 		String ans= "";
+
 		String reservationId = "8596384364162";
+		String guestId = "53448411";
+
 		Map<String, String> filterCriteria = new HashMap<>();
 		filterCriteria.put("status", "confirmed");
 
-		ans = String.valueOf(rq.getUsrInfo()); //getUsrInfo
+		// getUsrInfo
+		// getReservation
+		// getReservations
+		// getReservationAssignments
+		// getReservationInvoiceInformation
+		// getGuest
+
 		System.out.println(ans);
-
-		ans = String.valueOf(rq.getReservation(reservationId)); //getReservation
-		System.out.println(ans);
-
-
-		ans = String.valueOf(rq.getReservations(filterCriteria)); // getReservations
-		System.out.println(ans);
-
-		ans = String.valueOf(rq.getReservationAssignments("2022-05-30")); //getReservationAssignments
-		System.out.println(ans);
-
-		ans = String.valueOf(rq.getReservationInvoiceInformation(reservationId)); //getReservationInvoiceInformation
-		System.out.println(ans);
-
 
 		//UnTested methods
 		String note = "Reservation from OpenCheck-API";

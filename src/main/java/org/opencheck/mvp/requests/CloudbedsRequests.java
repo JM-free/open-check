@@ -290,4 +290,27 @@ public class CloudbedsRequests extends Request{
 
         return pmsResponse.get("success").toString().contains("true");
     }
+
+    // Cloudbeds's Guest Methods
+    public JSONObject getGuest(String guestId, String reservationId) {
+        JSONObject pmsResponse;
+        String urlRequest = null;
+
+        if (reservationId == null) {
+            urlRequest = new StringBuilder().append("https://hotels.cloudbeds.com/api/v1.1/getGuest").append("?guestID=").append(guestId).toString();
+            this.parameters.put("guestID", guestId);
+        } else if (guestId == null) {
+            urlRequest = new StringBuilder().append("https://hotels.cloudbeds.com/api/v1.1/getGuest").append("?reservationID=").append(reservationId).toString();
+        }
+
+        try {
+            URL url = new URL(urlRequest);
+            pmsResponse = Request.httpRequest(url, "GET", this.parameters, this.header);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return pmsResponse;
+    }
 }
