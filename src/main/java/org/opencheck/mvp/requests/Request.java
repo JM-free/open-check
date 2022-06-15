@@ -14,7 +14,7 @@ import java.net.HttpURLConnection;
 
 class Request {
 
-    private Request() {
+    Request() {
     }
 
     /**
