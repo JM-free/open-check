@@ -16,6 +16,7 @@ import java.util.Map;
 
 public class CloudbedsRequests extends Request{
 
+    public static final String PROPERTY_ID = "propertyID";
     private final String  clientId;
     private final String propertyId;
     private final String clientSecret;
@@ -43,7 +44,7 @@ public class CloudbedsRequests extends Request{
         this.code = code;
 
         this.parameters = new HashMap<>();
-        this.parameters.put("propertyID", this.propertyId);
+        this.parameters.put(PROPERTY_ID, this.propertyId);
     }
 
     //Getter-Setter section
@@ -75,7 +76,8 @@ public class CloudbedsRequests extends Request{
         return this.code;
     }
 
-    public String getAccessToken() {
+    public JSONObject getAccessToken() {
+        JSONObject pmsResponse;
         final String REFRESH_TOKEN = "refresh_token";
 
         try {
@@ -95,7 +97,7 @@ public class CloudbedsRequests extends Request{
             }
 
 
-            JSONObject pmsResponse = Request.httpRequest(url, "POST", requestParameters, null);
+            pmsResponse = Request.httpRequest(url, "POST", requestParameters, null);
             this.accessToken = (String) pmsResponse.get("access_token");
             this.refreshToken = (String) pmsResponse.get(REFRESH_TOKEN);
 
@@ -108,7 +110,7 @@ public class CloudbedsRequests extends Request{
         list.add("Bearer " + this.accessToken);
         this.header = list;
 
-        return this.accessToken;
+        return pmsResponse;
     }
 
     public void setAccessToken(String accessToken) {
@@ -291,6 +293,23 @@ public class CloudbedsRequests extends Request{
         return pmsResponse.get("success").toString().contains("true");
     }
 
+    public JSONObject putReservation(String reservationId, Map<String, String> extraParameters){
+        JSONObject pmsResponse;
+        this.parameters.put("reservationID", reservationId);
+        this.parameters.putAll(extraParameters);
+
+        try {
+            String urlStr = "https://hotels.cloudbeds.com/api/v1.1/putReservation";
+            URL url = new URL(urlStr);
+            pmsResponse = Request.httpRequest(url, "PUT", this.parameters, this.header);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return pmsResponse;
+    }
+
     // Cloudbeds's Guest Methods
     public JSONObject getGuest(String guestId, String reservationId) {
         JSONObject pmsResponse;
@@ -312,5 +331,25 @@ public class CloudbedsRequests extends Request{
         }
 
         return pmsResponse;
+    }
+
+    public JSONObject getGuestsByFilter(@NotNull Map<String, String> criteria) {
+        JSONObject pmsResponse;
+        criteria.put("propertyID", this.propertyId);
+
+        try {
+            URL url = new URL("https://hotels.cloudbeds.com/api/v1.1/getGuestsByFilter");
+            pmsResponse = Request.httpRequest(url, "GET", criteria, this.header);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return pmsResponse;
+    }
+
+
+    public String makeReservation(Map<String, String> bookingInfo) {
+        // TODO implement this method
+        return null;
     }
 }
