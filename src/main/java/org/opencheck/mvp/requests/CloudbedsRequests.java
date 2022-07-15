@@ -1,10 +1,12 @@
 package org.opencheck.mvp.requests;
 
+import org.apache.tomcat.util.json.JSONParser;
+import org.apache.tomcat.util.json.ParseException;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -47,6 +49,67 @@ public class CloudbedsRequests extends Request{
         this.parameters.put(PROPERTY_ID, this.propertyId);
     }
 
+    public CloudbedsRequests(String clientId, String propertyId, String clientSecret,
+                             String redirectUri) {
+        this.clientId = clientId;
+        this.propertyId = propertyId;
+        this.clientSecret = clientSecret;
+        this.redirectUri = redirectUri;
+        this.refreshToken = read_tokens().get("refresh_token");
+        this.accessToken = read_tokens().get("access_token");
+
+        this.parameters = new HashMap<>();
+        this.parameters.put(PROPERTY_ID, this.propertyId);
+    }
+
+    //Read & Write refreshToken
+    public boolean write_tokens(JSONObject tokens) {
+        if (tokens.isEmpty()){
+            return false;
+        } else {
+            ClassLoader classLoader = getClass().getClassLoader();
+            File file = new File(classLoader.getResource("static/data/tokens.json").getFile());
+
+            try (PrintWriter out = new PrintWriter(new FileWriter(file.getAbsolutePath()))) {
+                out.write(tokens.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+    }
+
+    public Map<String, String> read_tokens() {
+
+        Map<String, String> tokensMap = new HashMap<>();
+        tokensMap.put("access_token", "");
+        tokensMap.put("refresh_token", "");
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("static/data/tokens.json").getFile());
+
+        try (FileReader reader = new FileReader(file.getAbsolutePath()))
+        {
+            //Read JSON file
+            JSONParser jsonParser = new JSONParser(reader);
+            Object obj = jsonParser.parse();
+
+            tokensMap = (HashMap<String, String>) obj;
+            JSONObject tokensJSON = new JSONObject(tokensMap);
+
+            write_tokens(tokensJSON);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return tokensMap;
+    }
+
     //Getter-Setter section
     public String requestAccessTokenByScopes(@NotNull List<String> scopes){
 
@@ -78,7 +141,7 @@ public class CloudbedsRequests extends Request{
 
     public JSONObject getAccessToken() {
         JSONObject pmsResponse;
-        final String REFRESH_TOKEN = "refresh_token";
+        final String REFRESHTOKEN = "refresh_token";
 
         try {
             URL url = new URL("https://hotels.cloudbeds.com/api/v1.1/access_token");
@@ -89,8 +152,8 @@ public class CloudbedsRequests extends Request{
             requestParameters.put("redirect_uri", this.redirectUri);
 
             if (this.refreshToken != null){
-                requestParameters.put(REFRESH_TOKEN, this.refreshToken);
-                requestParameters.put("grant_type", REFRESH_TOKEN);
+                requestParameters.put(REFRESHTOKEN, this.refreshToken);
+                requestParameters.put("grant_type", REFRESHTOKEN);
             }else {
                 requestParameters.put("code", this.code);
                 requestParameters.put("grant_type", "authorization_code");
@@ -98,8 +161,11 @@ public class CloudbedsRequests extends Request{
 
 
             pmsResponse = Request.httpRequest(url, "POST", requestParameters, null);
+            write_tokens(pmsResponse);
+
             this.accessToken = (String) pmsResponse.get("access_token");
-            this.refreshToken = (String) pmsResponse.get(REFRESH_TOKEN);
+            this.refreshToken = (String) pmsResponse.get(REFRESHTOKEN);
+            write_tokens(pmsResponse);
 
         } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
@@ -294,7 +360,8 @@ public class CloudbedsRequests extends Request{
     }
 
     public JSONObject putReservation(String reservationId, Map<String, String> extraParameters){
-        JSONObject pmsResponse;
+        JSONObject pmsResponse = new JSONObject();
+
         this.parameters.put("reservationID", reservationId);
         this.parameters.putAll(extraParameters);
 
@@ -305,9 +372,14 @@ public class CloudbedsRequests extends Request{
 
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        } finally {
+            if (pmsResponse.isEmpty()){
+                pmsResponse.put("success", false);
+                pmsResponse.put("message", "error during reservation update");
+            }
 
-        return pmsResponse;
+            return pmsResponse;
+        }
     }
 
     // Cloudbeds's Guest Methods
