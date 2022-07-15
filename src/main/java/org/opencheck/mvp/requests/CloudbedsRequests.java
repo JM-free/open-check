@@ -24,7 +24,6 @@ public class CloudbedsRequests extends Request{
     private final String clientSecret;
     private final String redirectUri;
     private String code;
-
     private String state;
 
     private String accessToken;
@@ -55,11 +54,13 @@ public class CloudbedsRequests extends Request{
         this.propertyId = propertyId;
         this.clientSecret = clientSecret;
         this.redirectUri = redirectUri;
-        this.refreshToken = read_tokens().get("refresh_token");
-        this.accessToken = read_tokens().get("access_token");
 
         this.parameters = new HashMap<>();
         this.parameters.put(PROPERTY_ID, this.propertyId);
+
+        Map<String, String> tokens = read_tokens();
+        this.refreshToken =  tokens.get("refresh_token");
+        this.accessToken = tokens.get("access_token");
     }
 
     //Read & Write refreshToken
@@ -88,7 +89,7 @@ public class CloudbedsRequests extends Request{
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("static/data/tokens.json").getFile());
 
-        try (FileReader reader = new FileReader(file.getAbsolutePath()))
+        try (FileReader reader = new FileReader(file.getPath()))
         {
             //Read JSON file
             JSONParser jsonParser = new JSONParser(reader);
@@ -130,8 +131,7 @@ public class CloudbedsRequests extends Request{
 
             JSONObject pmsResponse = Request.httpRequest(url, "GET", null, null);
             this.code = (String) pmsResponse.get("code");
-            this.state = (String) pmsResponse.get("state");
-            
+
         } catch (MalformedURLException |  JSONException e) {
             throw new RuntimeException(e);
         }
